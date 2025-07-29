@@ -57,7 +57,6 @@ class SRSRewriter {
     ) {
       throw new Error("Invalid date provided");
     }
-    console.log(date, dateObj);
     return dateObj;
   }
 
@@ -94,7 +93,7 @@ class SRSRewriter {
 
     if (d.prefix !== this.srsPrefix) {
       throw new Error(
-        `SRS prefix mismatch: expected ${this.srsPrefix}, got ${prefix}`,
+        `SRS prefix mismatch: expected ${this.srsPrefix}, got ${d.prefix}`,
       );
     }
 

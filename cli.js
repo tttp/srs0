@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-require("dotenv").config({ quiet: true, debug: false });
+if (process.env.NODE_ENV !== 'test') {
+  require("dotenv").config({ quiet: true, debug: false });
+}
 const minimist = require("minimist");
 const SRS = require("./srs");
 
