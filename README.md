@@ -19,12 +19,12 @@ An SRS email address is composed of several parts, separated by `=`:
 *   **`SRS0`**: The prefix, indicating that this is an SRS address.
 *   **`HHH`**: A hash-based message authentication code (HMAC) to verify the integrity of the address.
 *   **`TT`**: A timestamp to prevent replay attacks.
-*   **`domain.com=user`**: The original email address, with the `@` replaced by `=`.
-*   **`srs.domain.com`**: The domain of the forwarding server.
+*   **`gmail.com=user`**: The original email address, with the `@` replaced by `=` and with a reverse order
+*   **`example.com`**: The domain of the forwarding server.
 
-For example, the email address `user@example.com` might be rewritten as:
+For example, the email address `user@gmail.com` might be rewritten as:
 
-`SRS0=H4F=T2A=example.com=user@mydomain.com`
+`SRS0=H4F=T2A=gmail.com=user@example.com`
 
 ## Installation
 
@@ -79,20 +79,23 @@ assuming a .env containing
 
 
     SRS_KEY="my-secret-key"
-    SRS_DOMAIN="mydomain.com"
+    SRS_DOMAIN="example.com"
 
 
 *   **Encode an email:**
 
     ```bash
-    ./cli.js user@example.com
+    $npx srs2 user@gmail.com
+    SRS0=785F=2K=gmail.com=user@example.com
+
     ```
 or 
 
 *   **Decode an SRS address:**
 
     ```bash
-    ./cli.js SRS0=HHH=TT=example.com=user@mydomain.com
+    $npx srs2 SRS0=785F=2K=gmail.com=user@example.com
+    user@gmail.com 2025-07-29
     ```
 
 ### Library
@@ -105,12 +108,12 @@ const SRS = require('srs2');
 // they shouldn't be hardcoded but read from environment variables
 const srsKey = 'my-secret-key';
 const srsPrefix = 'SRS0';
-const srsDomain = 'mydomain.com';
+const srsDomain = 'example.com';
 
 const srs = new SRS(srsKey, srsPrefix, srsDomain);
 
 // Encode an email address
-const originalEmail = 'user@example.com';
+const originalEmail = 'user@gmail.com';
 const srsAddress = srs.encode(originalEmail);
 console.log(`SRS Address: ${srsAddress}`);
 
