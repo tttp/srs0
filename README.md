@@ -10,6 +10,22 @@ SRS addresses this by rewriting the sender's email address to an address within 
 
 This package provides a command-line interface (CLI) and a JavaScript class to perform SRS encoding and decoding.
 
+## SRS Email Format
+
+An SRS email address is composed of several parts, separated by `=`:
+
+`SRS0=HHH=TT=domain.com=user@srs.domain.com`
+
+*   **`SRS0`**: The prefix, indicating that this is an SRS address.
+*   **`HHH`**: A hash-based message authentication code (HMAC) to verify the integrity of the address.
+*   **`TT`**: A timestamp to prevent replay attacks.
+*   **`domain.com=user`**: The original email address, with the `@` replaced by `=`.
+*   **`srs.domain.com`**: The domain of the forwarding server.
+
+For example, the email address `user@example.com` might be rewritten as:
+
+`SRS0=H4F=T2A=example.com=user@mydomain.com`
+
 ## Installation
 
 ```bash
@@ -20,7 +36,7 @@ npm install srs2
 
 ### CLI
 
-The package includes a CLI for encoding and decoding SRS addresses.
+The package includes a CLI for encoding and decoding SRS addresses. The CLI automatically determines whether to encode or decode an address based on its format. If the address has 5 parts separated by a =, it will be decoded; otherwise, it will be encoded.
 
 **Configuration:**
 
@@ -30,7 +46,9 @@ The CLI can be configured using environment variables or command-line parameters
 *   **`SRS_DOMAIN`**: The domain to use for the rewritten email address (e.g., `example.com`).
 *   **`SRS_PREFIX`**: The prefix for the SRS address (default: `SRS0`).
 
-They can be defined directly on the command line as flags
+You can also define them:
+- into a .env file (copy .env.example to .env and update accordingly)
+- directly on the command line as flags
 
 **Commands:**
 
@@ -57,18 +75,23 @@ They can be defined directly on the command line as flags
 
 **Examples:**
 
+assuming a .env containing
+
+
+    SRS_KEY="my-secret-key"
+    SRS_DOMAIN="mydomain.com"
+
+
 *   **Encode an email:**
 
     ```bash
-    export SRS_KEY="my-secret-key"
-    export SRS_DOMAIN="mydomain.com"
     ./cli.js user@example.com
     ```
+or 
 
 *   **Decode an SRS address:**
 
     ```bash
-    export SRS_KEY="my-secret-key"
     ./cli.js SRS0=HHH=TT=example.com=user@mydomain.com
     ```
 
@@ -79,6 +102,7 @@ The `srs2` package can also be used as a library in your Node.js applications.
 ```javascript
 const SRS = require('srs2');
 
+// they shouldn't be hardcoded but read from environment variables
 const srsKey = 'my-secret-key';
 const srsPrefix = 'SRS0';
 const srsDomain = 'mydomain.com';
@@ -97,4 +121,4 @@ console.log(`Original Address: ${decodedAddress.email}`);
 
 ## License
 
-ISC
+MIT

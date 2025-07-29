@@ -21,7 +21,7 @@
     "email"
   ],
   "author": "Xavier Dutoit",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/tttp/srs2/issues"
   },
