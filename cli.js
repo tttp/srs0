@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-require('dotenv').config({ quiet: true,debug: false });
-const minimist = require('minimist');
-const SRS = require('./srs');
+require("dotenv").config({ quiet: true, debug: false });
+const minimist = require("minimist");
+const SRS = require("./srs");
 
 function showHelp() {
   //-t, --time <timestamp> Unix timestamp in milliseconds (default: current time)
@@ -37,11 +37,11 @@ Note: Command line parameters override environment variables.
 function main() {
   const argv = minimist(process.argv.slice(2), {
     alias: {
-      k: 'key',
-      p: 'prefix',
-      d: 'date',
-      h: 'help'
-    }
+      k: "key",
+      p: "prefix",
+      d: "date",
+      h: "help",
+    },
   });
 
   if (argv.help) {
@@ -51,39 +51,40 @@ function main() {
 
   // Get configuration from env vars first, then override with CLI params
   const srsKey = argv.key || process.env.SRS_KEY;
-  const srsPrefix = argv.prefix || process.env.SRS_PREFIX || 'SRS0';
+  const srsPrefix = argv.prefix || process.env.SRS_PREFIX || "SRS0";
   const srsDomain = argv.domain || process.env.SRS_DOMAIN;
 
-
   if (!srsKey) {
-    console.error('Error: SRS key is required. Set SRS_KEY environment variable or use -k/--key parameter.');
-    console.error('Use --help for usage information.');
+    console.error(
+      "Error: SRS key is required. Set SRS_KEY environment variable or use -k/--key parameter.",
+    );
+    console.error("Use --help for usage information.");
     process.exit(1);
   }
 
   if (argv._.length === 0) {
-    console.error('Error: Email address is required.');
-    console.error('Use --help for usage information.');
+    console.error("Error: Email address is required.");
+    console.error("Use --help for usage information.");
     process.exit(1);
   }
 
   const email = argv._[0];
 
   const srs = new SRS(srsKey, srsPrefix, srsDomain);
-
-  try { address = srs.decode (email);
-    console.log(address.email,address.date);
+  if (srs.is(email)) {
+    try {
+      address = srs.decode(email);
+      console.log(address.email, address.date);
+    } catch (error) {
+      console.log("not a srs", error.toString());
+    }
     return;
-  } catch (error) {
-    
-    console.log ("not a srs", error.toString());
   }
-  
+
   try {
     const srsAddress = srs.encode(email, argv.date);
-    
+
     console.log(srsAddress);
-    
   } catch (error) {
     console.error(`Error: ${error.message}`);
     process.exit(1);
@@ -93,4 +94,3 @@ function main() {
 if (require.main === module) {
   main();
 }
-

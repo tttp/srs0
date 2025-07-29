@@ -1,30 +1,29 @@
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 class SRSRewriter {
-  constructor(srsKey, srsPrefix,srsDomain) {
+  constructor(srsKey, srsPrefix, srsDomain) {
     this.srsKey = srsKey;
     this.srsPrefix = srsPrefix;
     this.alphabet32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    this.alphabet32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    this.srsDomain = srsDomain ? "@"+srsDomain : '';
+    this.srsDomain = srsDomain ? "@" + srsDomain : "";
   }
 
-parseEmail(email) {
-  const match = email.match(/^([^@]+)@(.+)$/);
-  if (!match) {
-    throw new Error('Invalid email format');
+  parseEmail(email) {
+    const match = email.match(/^([^@]+)@(.+)$/);
+    if (!match) {
+      throw new Error("Invalid email format");
+    }
+    return {
+      username: match[1],
+      domain: match[2],
+    };
   }
-  return {
-    username: match[1],
-    domain: match[2]
-  };
-}
 
-timestamp2date (timestamp) {
-   const currentDays = Math.floor(Date.now() / 1000 / (60 * 60 * 24));
+  timestamp2date(timestamp) {
+    const currentDays = Math.floor(Date.now() / 1000 / (60 * 60 * 24));
 
-   const currentMod = currentDays % 1024;
-   let matchingDay;
+    const currentMod = currentDays % 1024;
+    let matchingDay;
     if (timestamp <= currentMod) {
       // The timestamp is in the current cycle
       matchingDay = currentDays - (currentMod - timestamp);
@@ -32,90 +31,110 @@ timestamp2date (timestamp) {
       // The timestamp is from the previous cycle
       matchingDay = currentDays - (currentMod + (1024 - timestamp));
     }
-    
+
     // Convert back to actual date
     const matchingDate = new Date(matchingDay * 24 * 60 * 60 * 1000);
     return matchingDate.toISOString().substring(0, 10);
-}
+  }
 
-date2timestamp (date) {
-  if (!date) return Date.now();
-      const dateMatch = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      if (!dateMatch) {
-        throw new Error('Invalid date format. Expected YYYY-MM-DD, got'+date);
-      }
-      
-      const [, year, month, day] = dateMatch;
-      const dateObj = new Date(Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)));
-      
-      // Validate the date is valid
-      if (dateObj.getFullYear() != year || 
-          dateObj.getMonth() != month - 1 || 
-          dateObj.getDate() != day) {
-        throw new Error('Invalid date provided');
-      }
-      console.log (date,dateObj);
-return dateObj;
-//      finalUnixTime = dateObj.getTime();
+  date2timestamp(date) {
+    if (!date) return Date.now();
+    const dateMatch = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!dateMatch) {
+      throw new Error("Invalid date format. Expected YYYY-MM-DD, got" + date);
     }
 
-validateSRS(srsAddress) {
-    let timestamp = undefined;
-    const localPart = srsAddress.split('@')[0];
-     
-    const parts = localPart.split('=');
-    
-    if (parts.length !== 5) {
-      return { isError: true, error: 'Invalid SRS format: expected 5 parts separated by ='};
+    const [, year, month, day] = dateMatch;
+    const dateObj = new Date(
+      Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day)),
+    );
+
+    // Validate the date is valid
+    if (
+      dateObj.getFullYear() != year ||
+      dateObj.getMonth() != month - 1 ||
+      dateObj.getDate() != day
+    ) {
+      throw new Error("Invalid date provided");
     }
+    console.log(date, dateObj);
+    return dateObj;
+  }
 
-    const [prefix, hash, encodedTimestamp, domain, username] = parts;
-
-    if (prefix !== this.srsPrefix) {
-      return { isError: true, error: `SRS prefix mismatch: expected ${this.srsPrefix}, got ${prefix}`};
-    }
-
-    // Verify timestamp can be decoded
+  is(srsAddress) {
+    //check the format
     try {
-      timestamp = this.decodeInt32(encodedTimestamp);
-    } catch (error) {
-      return {isError: true, error:`Invalid timestamp encoding: ${error.message}`};
+      this.getParts(srsAddress);
+      return true;
+    } catch (e) {
+      return false;
     }
-    
-    // Verify hash
-    const expectedHash = crypto
-      .createHmac('sha1', this.srsKey)
-      .update(encodedTimestamp + domain + username)
-      .digest('hex')
-      .toUpperCase()
-      .slice(0, 4);
+  }
 
-    if (hash !== expectedHash) {
-      return {isError: true, error:'SRS has verification failed: invalid secret key or corrupted SRS address'};
+  getParts(srsAddress) {
+    const localPart = srsAddress.split("@")[0];
+
+    const parts = localPart.split("=");
+
+    if (parts.length !== 5) {
+      throw new Error("Invalid SRS format: expected 5 parts separated by =");
     }
 
-    return { timestamp, date: this.timestamp2date(timestamp), email: username + '@' + domain, isError: false, error: undefined };
+    return {
+      prefix: parts[0],
+      hash: parts[1],
+      encodedTimestamp: parts[2],
+      domain: parts[3],
+      username: parts[4],
+    };
   }
 
   decode(srsAddress) {
-    const parsed = this.validateSRS(srsAddress);
-    if(parsed.isError) throw new Error (parsed.error);
-    return parsed;
+    const d = this.getParts(srsAddress);
+
+    if (d.prefix !== this.srsPrefix) {
+      throw new Error(
+        `SRS prefix mismatch: expected ${this.srsPrefix}, got ${prefix}`,
+      );
+    }
+
+    // can throw an error
+    const timestamp = this.decodeInt32(d.encodedTimestamp);
+
+    // Verify hash
+    const expectedHash = crypto
+      .createHmac("sha1", this.srsKey)
+      .update(d.encodedTimestamp + d.domain + d.username)
+      .digest("hex")
+      .toUpperCase()
+      .slice(0, 4);
+
+    if (d.hash !== expectedHash) {
+      throw new Error(
+        "SRS has verification failed: invalid secret key or corrupted SRS address",
+      );
+    }
+
+    return {
+      date: this.timestamp2date(timestamp),
+      email: d.username + "@" + d.domain,
+    };
   }
 
   encode(email, date) {
-    const {username, domain} = this.parseEmail (email);
-    const unixTime = this.date2timestamp (date);
-    const timestamp = this.encodeInt32(Math.floor(unixTime / 1000 / (60 * 60 * 24)) % 1024);
+    const { username, domain } = this.parseEmail(email);
+    const unixTime = this.date2timestamp(date);
+    const timestamp = this.encodeInt32(
+      Math.floor(unixTime / 1000 / (60 * 60 * 24)) % 1024,
+    );
     const hash = crypto
-      .createHmac('sha1', this.srsKey)
+      .createHmac("sha1", this.srsKey)
       .update(timestamp + domain + username)
-      .digest('hex')
+      .digest("hex")
       .toUpperCase()
       .slice(0, 4);
 
     return `${this.srsPrefix}=${hash}=${timestamp}=${domain}=${username}${this.srsDomain}`;
-
   }
 
   decodeInt32(encoded) {
@@ -136,10 +155,5 @@ validateSRS(srsAddress) {
     return this.encodeInt32(Math.floor(n / 32), this.alphabet32[n % 32] + acc);
   }
 }
-
-// Usage example:
-//const srsRewriter = new SRSRewriter("your-srs-key-here", "SRS0", "srs-example.org");
-//const result = srsRewriter.rewriteSender("user@example.com");
-//console.log(result);
 
 module.exports = SRSRewriter;

@@ -2,8 +2,13 @@
   "name": "srs2",
   "version": "1.0.0",
   "description": "Sender Rewriting Scheme",
-  "main": "./src.js",
+  "main": "./srs.js",
   "bin": "./cli.js",
+  "files": [
+    "srs.js",
+    "cli.js",
+    "README.md"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
