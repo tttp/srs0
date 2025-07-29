@@ -2,9 +2,9 @@ const test = require('ava');
 const SRSRewriter = require('../srs.js');
 
 const srs = new SRSRewriter({
-  srsKey: 'secret',
-  srsPrefix: 'SRS0',
-  srsDomain: 'example.com',
+  key: 'secret',
+  prefix: 'SRS0',
+  domain: 'example.com',
 });
 
 test('parseEmail with valid email', t => {

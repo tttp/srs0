@@ -72,7 +72,7 @@ function main() {
 
   const email = argv._[0];
 
-  const srs = new SRS({ srsKey, srsPrefix, srsDomain });
+  const srs = new SRS({ key: srsKey, prefix: srsPrefix, domain: srsDomain });
   if (srs.is(email)) {
     try {
       address = srs.decode(email);

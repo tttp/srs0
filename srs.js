@@ -1,11 +1,11 @@
 const crypto = require("crypto");
 
 class SRSRewriter {
-  constructor({ srsKey, srsPrefix, srsDomain }) {
-    this.srsKey = srsKey;
-    this.srsPrefix = srsPrefix;
+  constructor({ key, prefix, domain }) {
+    this.srsKey = key;
+    this.srsPrefix = prefix;
     this.alphabet32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    this.srsDomain = srsDomain ? "@" + srsDomain : "";
+    this.srsDomain = domain ? "@" + domain : "";
   }
 
   parseEmail(email) {
