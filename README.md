@@ -4,7 +4,7 @@
 
 ## Description
 
-When an email is forwarded, the original sender's address is often preserved. However, if the receiving server performs SPF (Sender Policy Framework) checks, it may reject the forwarded email because the forwarding server is not listed as an authorized sender for the original domain.
+When an email is forwarded, the original sender's address is often preserved. However, when the receiving server performs SPF (Sender Policy Framework) checks, it will reject the forwarded email because the forwarding server is not listed as an authorized sender for the original domain.
 
 SRS addresses this by rewriting the sender's email address to an address within the forwarding domain. This new address includes a hash and a timestamp to ensure that the address is valid and to prevent abuse. When a bounce or reply is sent to the rewritten address, it can be decoded to retrieve the original sender's address.
 
