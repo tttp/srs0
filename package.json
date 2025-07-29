@@ -10,7 +10,8 @@
     "README.md"
   ],
   "scripts": {
-    "test": "NODE_ENV=test ava test/*.test.js"
+    "test": "NODE_ENV=test ava test/*.test.js",
+    "prepublishOnly": "npm test"
   },
   "repository": {
     "type": "git",
