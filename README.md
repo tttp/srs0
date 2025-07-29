@@ -17,14 +17,14 @@ An SRS email address is composed of several parts, separated by `=`:
 `SRS0=HHH=TT=domain.com=user@srs.domain.com`
 
 *   **`SRS0`**: The prefix, indicating that this is an SRS address.
-*   **`HHH`**: A hash-based message authentication code (HMAC) to verify the integrity of the address.
+*   **`HHHH`**: A hash-based message authentication code (HMAC) to verify the integrity of the address.
 *   **`TT`**: A timestamp to prevent replay attacks.
 *   **`gmail.com=user`**: The original email address, with the `@` replaced by `=` and with a reverse order
 *   **`example.com`**: The domain of the forwarding server.
 
 For example, the email address `user@gmail.com` might be rewritten as:
 
-`SRS0=H4F=T2A=gmail.com=user@example.com`
+`SRS0=785F=2K=gmail.com=user@example.com`
 
 ## Installation
 
@@ -34,15 +34,36 @@ npm install srs2
 
 ## Usage
 
+### Library
+
+The `srs2` package can be used as a library in your Node.js applications.
+
+```javascript
+const SRS = require('srs2');
+
+// for production, don't leave these config in the code
+const srs = new SRS({key: 'my-secret-key', prefix: 'SRS0', domain = 'example.com');
+
+// Encode an email address
+const originalEmail = 'user@gmail.com';
+const srsAddress = srs.encode(originalEmail);
+console.log(`SRS Address: ${srsAddress}`);
+
+// Decode an SRS address
+const decodedAddress = srs.decode(srsAddress);
+console.log(`Original Address: ${decodedAddress.email}`);
+```
+
 ### CLI
 
-The package includes a CLI for encoding and decoding SRS addresses. The CLI automatically determines whether to encode or decode an address based on its format. If the address has 5 parts separated by a =, it will be decoded; otherwise, it will be encoded.
+The package includes a CLI for encoding and decoding SRS addresses. 
+The CLI automatically determines whether to encode or decode an address based on its format: If the email has 5 parts separated by a =, it will be decoded; otherwise, it will be encoded.
 
 **Configuration:**
 
 The CLI can be configured using environment variables or command-line parameters.
 
-*   **`SRS_KEY`**: (Required) The secret key used for generating the SRS hash.
+*   **`SRS_KEY`**: The secret key used for generating the SRS hash.
 *   **`SRS_DOMAIN`**: The domain to use for the rewritten email address (e.g., `example.com`).
 *   **`SRS_PREFIX`**: The prefix for the SRS address (default: `SRS0`).
 
@@ -55,23 +76,23 @@ You can also define them:
 *   **Encode an email address:**
 
     ```bash
-    ./cli.js [options] <email>
+    ./cli.js <email> [--domain example.com] [--date 2025-07-29] [--prefix SRS0] [--key your-secret-key]
     ```
 
 *   **Decode an SRS address:**
 
     ```bash
-    ./cli.js <srs_address>
+    ./cli.js <srs_address> 
     ```
 
 
 **Options:**
 
+*   `-h, --help`: Show the help message.
 *   `-k, --key <key>`: Overrides the `SRS_KEY` environment variable.
 *   `-p, --prefix <prefix>`: Overrides the `SRS_PREFIX` environment variable.
 *   `-d, --date <date>`: The date to use for the timestamp (format: `YYYY-MM-DD`). Defaults to the current date.
 *   `--domain <domain>`: Overrides the `SRS_DOMAIN` environment variable.
-*   `-h, --help`: Show the help message.
 
 **Examples:**
 
@@ -97,30 +118,6 @@ or
     $npx srs2 SRS0=785F=2K=gmail.com=user@example.com
     user@gmail.com 2025-07-29
     ```
-
-### Library
-
-The `srs2` package can also be used as a library in your Node.js applications.
-
-```javascript
-const SRS = require('srs2');
-
-// they shouldn't be hardcoded but read from environment variables
-const srsKey = 'my-secret-key';
-const srsPrefix = 'SRS0';
-const srsDomain = 'example.com';
-
-const srs = new SRS(srsKey, srsPrefix, srsDomain);
-
-// Encode an email address
-const originalEmail = 'user@gmail.com';
-const srsAddress = srs.encode(originalEmail);
-console.log(`SRS Address: ${srsAddress}`);
-
-// Decode an SRS address
-const decodedAddress = srs.decode(srsAddress);
-console.log(`Original Address: ${decodedAddress.email}`);
-```
 
 ## License
 
