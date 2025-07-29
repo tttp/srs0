@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 
 class SRSRewriter {
-  constructor(srsKey, srsPrefix, srsDomain) {
+  constructor({ srsKey, srsPrefix, srsDomain }) {
     this.srsKey = srsKey;
     this.srsPrefix = srsPrefix;
     this.alphabet32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";

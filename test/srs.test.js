@@ -1,7 +1,11 @@
 const test = require('ava');
 const SRSRewriter = require('../srs.js');
 
-const srs = new SRSRewriter('secret', 'SRS0', 'example.com');
+const srs = new SRSRewriter({
+  srsKey: 'secret',
+  srsPrefix: 'SRS0',
+  srsDomain: 'example.com',
+});
 
 test('parseEmail with valid email', t => {
     const email = 'user@domain.com';
@@ -46,10 +50,30 @@ test('decode with invalid hash', t => {
     t.is(error.message, 'SRS has verification failed: invalid secret key or corrupted SRS address');
 });
 
-test('encode with today\'s date is same as no date', t => {
+test('decode with invalid timestamp', t => {
+    const srsAddress = srs.encode('user@gmail.com', '2025-04-09');
+    const parts = srsAddress.split('=');
+    parts[2] = '2J'; // Tamper with the timestamp
+    const tamperedAddress = parts.join('=');
+
+    const error = t.throws(() => {
+        srs.decode(tamperedAddress);
+    }, { instanceOf: Error });
+    t.is(error.message, 'SRS has verification failed: invalid secret key or corrupted SRS address');
+});
+
+test("encode with today's date is same as no date", t => {
     const email = 'user@domain.com';
     const today = new Date().toISOString().slice(0, 10);
     const srsAddressWithDate = srs.encode(email, today);
     const srsAddressWithoutDate = srs.encode(email);
     t.is(srsAddressWithDate, srsAddressWithoutDate);
+});
+
+test('encode specific email and date produces expected SRS address', t => {
+    const email = 'user@gmail.com';
+    const date = '2025-07-29';
+    const expectedSrsAddress = 'SRS0=C592=2K=gmail.com=user@example.com';
+    const srsAddress = srs.encode(email, date);
+    t.is(srsAddress, expectedSrsAddress);
 });
