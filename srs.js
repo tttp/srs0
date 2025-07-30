@@ -1,11 +1,12 @@
 const crypto = require("crypto");
 
 class SRSRewriter {
-  constructor({ key, prefix, domain }) {
+  constructor({ key, prefix, domain, validityDays = 90 }) {
     this.srsKey = key;
     this.srsPrefix = prefix;
     this.alphabet32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     this.srsDomain = domain ? "@" + domain : "";
+    this.validityDays = validityDays;
   }
 
   parseEmail(email) {
@@ -119,6 +120,17 @@ class SRSRewriter {
     if (d.hash !== expectedHash) {
       const error = new Error("SRS has verification failed: invalid secret key or corrupted SRS address");
       error.code = "INVALID_SRS";
+      throw error;
+    }
+
+    const srsDate = new Date(this.timestamp2date(timestamp));
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - srsDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays > this.validityDays) {
+      const error = new Error(`SRS address is too old. It was generated ${diffDays} days ago, but the maximum allowed age is ${this.validityDays} days.`);
+      error.code = "SRS_TOO_OLD";
       throw error;
     }
 

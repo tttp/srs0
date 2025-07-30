@@ -87,4 +87,26 @@ test('hardcoded dates 1024 days apart produce the same numerical timestamp', t =
     t.is(timestamp1, timestamp2);
 });
 
+test('decode throws SRS_TOO_OLD error for old SRS address', t => {
+    const oldSrs = new SRSRewriter({
+        key: 'secret',
+        prefix: 'SRS0',
+        domain: 'example.com',
+        validityDays: 1,
+    });
+
+    const email = 'user@domain.com';
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 2); // 2 days ago, older than 1 day validity
+    const oldDateString = oldDate.toISOString().slice(0, 10);
+
+    const srsAddress = oldSrs.encode(email, oldDateString);
+
+    const error = t.throws(() => {
+        oldSrs.decode(srsAddress);
+    }, { instanceOf: Error });
+    t.is(error.code, 'SRS_TOO_OLD');
+    t.true(error.message.includes('SRS address is too old'));
+});
+
 

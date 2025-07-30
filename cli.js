@@ -19,12 +19,14 @@ Options:
   -p, --prefix <prefix>  SRS prefix (overrides SRS_PREFIX env var, default: SRS0)
   -d, --date <date> default: today
   --domain <domain>  domain for the generated SRS email
+  --validity <days>  SRS validity in days (overrides SRS_VALIDITY_DAYS env var, default: 90)
   -h, --help            Show this help message
 
 Environment Variables:
   SRS_KEY     - SRS secret key
   SRS_DOMAIN  - SRS email domain (@example.org)
   SRS_PREFIX  - SRS prefix (default: SRS0)
+  SRS_VALIDITY_DAYS - SRS validity in days (default: 90)
 
 Examples:
   ./cli.js user@example.com
@@ -55,6 +57,7 @@ function main() {
   const srsKey = argv.key || process.env.SRS_KEY;
   const srsPrefix = argv.prefix || process.env.SRS_PREFIX || "SRS0";
   const srsDomain = argv.domain || process.env.SRS_DOMAIN;
+  const srsValidityDays = argv.validity || process.env.SRS_VALIDITY_DAYS || 90;
 
   if (!srsKey) {
     console.error(
@@ -72,13 +75,17 @@ function main() {
 
   const email = argv._[0];
 
-  const srs = new SRS({ key: srsKey, prefix: srsPrefix, domain: srsDomain });
+  const srs = new SRS({ key: srsKey, prefix: srsPrefix, domain: srsDomain, validityDays: srsValidityDays });
   if (srs.is(email)) {
     try {
       address = srs.decode(email);
       console.log(address.email, address.date);
     } catch (error) {
-      console.log("not a srs", error.toString());
+      if (error.code) {
+        console.error(`Error: \x1b[31m${error.code}\x1b[0m ${error.message}`);
+      } else {
+        console.error(`Error: ${error.message}`);
+      }
     }
     return;
   }
@@ -88,7 +95,11 @@ function main() {
 
     console.log(srsAddress);
   } catch (error) {
-    console.error(`Error: ${error.message}`);
+    if (error.code) {
+      console.error(`Error: \x1b[31m${error.code}\x1b[0m ${error.message}`);
+    } else {
+      console.error(`Error: ${error.message}`);
+    }
     process.exit(1);
   }
 }
