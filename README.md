@@ -26,6 +26,25 @@ For example, the email address `user@gmail.com` might be rewritten as:
 
 `SRS0=785F=2K=gmail.com=user@example.com`
 
+## Validity Period
+
+SRS addresses include a timestamp to prevent replay attacks and to ensure that the address is not used indefinitely. By default, an SRS address is considered valid for 90 days from its creation. If an attempt is made to decode an SRS address older than this period, an `SRS_TOO_OLD` error will be thrown.
+
+This validity period can be configured when initializing the `SRSRewriter` class or via the CLI.
+
+## Error Codes
+
+The `srs2` library throws `Error` objects with a `code` property for easier programmatic error handling. The possible error codes are:
+
+*   `INVALID_EMAIL_FORMAT`: The provided email address is not in a valid format.
+*   `INVALID_DATE_FORMAT`: The provided date string is not in the expected `YYYY-MM-DD` format.
+*   `INVALID_DATE_PROVIDED`: The provided date is invalid (e.g., non-existent date).
+*   `INVALID_SRS_FORMAT`: The SRS address string does not have the expected number of parts.
+*   `INVALID_PREFIX`: The SRS address prefix does not match the configured prefix.
+*   `INVALID_SRS`: The SRS address hash verification failed, indicating a corrupted or tampered address, or an incorrect secret key.
+*   `INVALID_TIMESTAMP`: An invalid character was found in the encoded timestamp.
+*   `SRS_TOO_OLD`: The SRS address is older than the configured validity period.
+
 ## Installation
 
 ```bash
@@ -42,7 +61,7 @@ The `srs2` package can be used as a library in your Node.js applications.
 const SRS = require('srs2');
 
 // for production, don't leave these config in the code
-const srs = new SRS({key: 'my-secret-key', prefix: 'SRS0', domain = 'example.com');
+const srs = new SRS({key: 'my-secret-key', prefix: 'SRS0', domain: 'example.com', validityDays: 90});
 
 // Encode an email address
 const originalEmail = 'user@gmail.com';
