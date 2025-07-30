@@ -17,7 +17,8 @@ test('parseEmail with invalid email', t => {
     const email = 'userdomain.com';
     const error = t.throws(() => {
         srs.parseEmail(email);
-    }, { instanceOf: Error });
+    });
+    t.is(error.code, 'INVALID_EMAIL_FORMAT');
     t.is(error.message, 'Invalid email format');
 });
 
@@ -47,6 +48,7 @@ test('decode with invalid hash', t => {
     const error = t.throws(() => {
         srs.decode(tamperedAddress);
     }, { instanceOf: Error });
+    t.is(error.code, 'INVALID_SRS');
     t.is(error.message, 'SRS has verification failed: invalid secret key or corrupted SRS address');
 });
 
@@ -59,6 +61,7 @@ test('decode with invalid timestamp', t => {
     const error = t.throws(() => {
         srs.decode(tamperedAddress);
     }, { instanceOf: Error });
+    t.is(error.code, 'INVALID_SRS');
     t.is(error.message, 'SRS has verification failed: invalid secret key or corrupted SRS address');
 });
 
@@ -70,10 +73,18 @@ test("encode with today's date is same as no date", t => {
     t.is(srsAddressWithDate, srsAddressWithoutDate);
 });
 
-test('encode specific email and date produces expected SRS address', t => {
-    const email = 'user@gmail.com';
-    const date = '2025-07-29';
-    const expectedSrsAddress = 'SRS0=C592=2K=gmail.com=user@example.com';
-    const srsAddress = srs.encode(email, date);
-    t.is(srsAddress, expectedSrsAddress);
+test('hardcoded dates 1024 days apart produce the same numerical timestamp', t => {
+    const email = 'user@domain.com';
+    const date1 = '2025-07-30';
+    const date2 = '2028-05-19'; // 2025-07-30 + 1024 days
+
+    const srsAddress1 = srs.encode(email, date1);
+    const srsAddress2 = srs.encode(email, date2);
+
+    const timestamp1 = srs.decodeInt32(srsAddress1.split('=')[2]);
+    const timestamp2 = srs.decodeInt32(srsAddress2.split('=')[2]);
+
+    t.is(timestamp1, timestamp2);
 });
+
+

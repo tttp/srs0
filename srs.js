@@ -11,7 +11,9 @@ class SRSRewriter {
   parseEmail(email) {
     const match = email.match(/^([^@]+)@(.+)$/);
     if (!match) {
-      throw new Error("Invalid email format");
+      const error = new Error("Invalid email format");
+      error.code = "INVALID_EMAIL_FORMAT";
+      throw error;
     }
     return {
       username: match[1],
@@ -41,7 +43,9 @@ class SRSRewriter {
     if (!date) return Date.now();
     const dateMatch = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
     if (!dateMatch) {
-      throw new Error("Invalid date format. Expected YYYY-MM-DD, got" + date);
+      const error = new Error("Invalid date format. Expected YYYY-MM-DD, got" + date);
+    error.code = "INVALID_DATE_FORMAT";
+    throw error;
     }
 
     const [, year, month, day] = dateMatch;
@@ -55,7 +59,9 @@ class SRSRewriter {
       dateObj.getMonth() != month - 1 ||
       dateObj.getDate() != day
     ) {
-      throw new Error("Invalid date provided");
+      const error = new Error("Invalid date provided");
+    error.code = "INVALID_DATE_PROVIDED";
+    throw error;
     }
     return dateObj;
   }
@@ -76,7 +82,9 @@ class SRSRewriter {
     const parts = localPart.split("=");
 
     if (parts.length !== 5) {
-      throw new Error("Invalid SRS format: expected 5 parts separated by =");
+      const error = new Error("Invalid SRS format: expected 5 parts separated by =");
+    error.code = "INVALID_SRS_FORMAT";
+    throw error;
     }
 
     return {
@@ -92,9 +100,9 @@ class SRSRewriter {
     const d = this.getParts(srsAddress);
 
     if (d.prefix !== this.srsPrefix) {
-      throw new Error(
-        `SRS prefix mismatch: expected ${this.srsPrefix}, got ${d.prefix}`,
-      );
+      const error = new Error(`SRS prefix mismatch: expected ${this.srsPrefix}, got ${d.prefix}`);
+    error.code = "INVALID_PREFIX";
+    throw error;
     }
 
     // can throw an error
@@ -109,9 +117,9 @@ class SRSRewriter {
       .slice(0, 4);
 
     if (d.hash !== expectedHash) {
-      throw new Error(
-        "SRS has verification failed: invalid secret key or corrupted SRS address",
-      );
+      const error = new Error("SRS has verification failed: invalid secret key or corrupted SRS address");
+      error.code = "INVALID_SRS";
+      throw error;
     }
 
     return {
@@ -142,7 +150,9 @@ class SRSRewriter {
       const char = encoded[i];
       const value = this.alphabet32.indexOf(char);
       if (value === -1) {
-        throw new Error(`Invalid character in encoded timestamp: ${char}`);
+        const error = new Error(`Invalid character in encoded timestamp: ${char}`);
+        error.code = "INVALID_TIMESTAMP";
+        throw error;
       }
       result = result * 32 + value;
     }
