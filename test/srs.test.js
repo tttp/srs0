@@ -109,4 +109,27 @@ test('decode throws SRS_TOO_OLD error for old SRS address', t => {
     t.true(error.message.includes('SRS address is too old'));
 });
 
+test('default validityDays: 89 days old is valid', t => {
+    const email = 'user@domain.com';
+    const date89DaysAgo = new Date();
+    date89DaysAgo.setDate(date89DaysAgo.getDate() - 89);
+    const srsAddress = srs.encode(email, date89DaysAgo.toISOString().slice(0, 10));
+    t.notThrows(() => {
+        srs.decode(srsAddress);
+    });
+});
+
+test('default validityDays: 90 days old is invalid', t => {
+    const email = 'user@domain.com';
+    const date90DaysAgo = new Date();
+    date90DaysAgo.setDate(date90DaysAgo.getDate() - 90);
+    const srsAddress = srs.encode(email, date90DaysAgo.toISOString().slice(0, 10));
+
+    const error = t.throws(() => {
+        srs.decode(srsAddress);
+    }, { instanceOf: Error });
+    t.is(error.code, 'SRS_TOO_OLD');
+    t.true(error.message.includes('SRS address is too old'));
+});
+
 
