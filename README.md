@@ -61,7 +61,8 @@ The `srs2` package can be used as a library in your Node.js applications.
 const SRS = require('srs2');
 
 // for production, don't leave these config in the code
-const srs = new SRS({key: 'my-secret-key', prefix: 'SRS0', domain: 'example.com', validityDays: 90});
+const srs = new SRS({key: 'my-secret-key', domain: 'example.com'});
+// same as const srs = new SRS({key: 'my-secret-key', prefix: 'SRS0', domain: 'example.com', validityDays: 90});
 
 // Encode an email address
 const originalEmail = 'user@gmail.com';
@@ -112,6 +113,7 @@ You can also define them:
 *   `-p, --prefix <prefix>`: Overrides the `SRS_PREFIX` environment variable.
 *   `-d, --date <date>`: The date to use for the timestamp (format: `YYYY-MM-DD`). Defaults to the current date.
 *   `--domain <domain>`: Overrides the `SRS_DOMAIN` environment variable.
+*   `--validity <days>`: Overrides the `SRS_VALIDITY_DAYS` environment variable (default: 90).
 
 **Examples:**
 
