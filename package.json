@@ -11,8 +11,9 @@
   },
   "bin": "./cli.mjs",
   "files": [
-    "srs.js",
-    "cli.js",
+    "srs.cjs",
+    "srs.mjs",
+    "cli.mjs",
     "README.md"
   ],
   "scripts": {

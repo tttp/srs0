@@ -8,7 +8,7 @@ function runCli(args, env = {}) {
         delete testEnv.SRS_PREFIX;
         delete testEnv.SRS_DOMAIN;
 
-        const cli = spawn('node', ['cli.js', ...args], { env: { ...testEnv, ...env } });
+        const cli = spawn('node', ['cli.mjs', ...args], { env: { ...testEnv, ...env } });
         let stdout = '';
         let stderr = '';
 
@@ -35,7 +35,7 @@ function runCli(args, env = {}) {
 
 test('CLI shows help message', async t => {
     const { stdout } = await runCli(['--help']);
-    t.true(stdout.includes('Usage: node srs-cli.js [options] <email>'));
+    t.true(stdout.includes('Usage: node cli.mjs [options] <email>'));
 });
 
 test('CLI errors without SRS key', async t => {

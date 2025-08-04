@@ -96,13 +96,13 @@ You can also define them:
 *   **Encode an email address:**
 
     ```bash
-    ./cli.js <email> [--domain example.com] [--date 2025-07-29] [--prefix SRS0] [--key your-secret-key]
+    ./cli.mjs <email> [--domain example.com] [--date 2025-07-29] [--prefix SRS0] [--key your-secret-key]
     ```
 
 *   **Decode an SRS address:**
 
     ```bash
-    ./cli.js <srs_address> 
+    ./cli.mjs <srs_address> 
     ```
 
 

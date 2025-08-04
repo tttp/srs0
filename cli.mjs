@@ -10,11 +10,11 @@ if (process.env.NODE_ENV !== 'test') {
 
 function showHelp() {
   //-t, --time <timestamp> Unix timestamp in milliseconds (default: current time)
-  //node srs-cli.js -t 1640995200000 user@example.com
+  //node srs-cli.cjs -t 1640995200000 user@example.com
   console.log(`
 SRS Email Rewriter CLI
 
-Usage: node srs-cli.js [options] <email>
+Usage: node cli.mjs [options] <email>
 
 Options:
   -k, --key <key>        SRS secret key (overrides SRS_KEY env var)
@@ -31,10 +31,10 @@ Environment Variables:
   SRS_VALIDITY_DAYS - SRS validity in days (default: 90)
 
 Examples:
-  ./cli.js user@example.com
-  ./cli.js -k "my-secret-key" user@example.com
-  ./cli.js --prefix "SRS1" user@example.com
-  ./cli.js  user@example.com -d 2025-01-31
+  ./cli.mjs user@example.com
+  ./cli.mjs -k "my-secret-key" user@example.com
+  ./cli.mjs --prefix "SRS1" user@example.com
+  ./cli.mjs  user@example.com -d 2025-01-31
 
 Note: Command line parameters override environment variables.
 `);
