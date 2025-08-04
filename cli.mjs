@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 
+import { config } from "dotenv";
+import minimist from "minimist";
+import SRS from "./srs.mjs";
+
 if (process.env.NODE_ENV !== 'test') {
-  require("dotenv").config({ quiet: true, debug: false });
+  config({ quiet: true, debug: false });
 }
-const minimist = require("minimist");
-const SRS = require("./srs");
 
 function showHelp() {
   //-t, --time <timestamp> Unix timestamp in milliseconds (default: current time)
@@ -78,7 +80,7 @@ function main() {
   const srs = new SRS({ key: srsKey, prefix: srsPrefix, domain: srsDomain, validityDays: srsValidityDays });
   if (srs.is(email)) {
     try {
-      address = srs.decode(email);
+      const address = srs.decode(email);
       console.log(address.email, address.date);
     } catch (error) {
       if (error.code) {
@@ -104,6 +106,6 @@ function main() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url.startsWith('file:') && process.argv[1] === new URL(import.meta.url).pathname) {
   main();
 }

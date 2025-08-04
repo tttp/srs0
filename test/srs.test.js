@@ -1,5 +1,5 @@
-const test = require('ava');
-const SRSRewriter = require('../srs.js');
+import test from 'ava';
+import SRSRewriter from '../srs.mjs';
 
 const srs = new SRSRewriter({
   key: 'secret',

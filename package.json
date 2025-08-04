@@ -1,9 +1,15 @@
 {
-  "name": "srs2",
-  "version": "1.2.0",
+  "name": "srs0",
+  "version": "1.3.0",
   "description": "Sender Rewriting Scheme",
-  "main": "./srs.js",
-  "bin": "./cli.js",
+  "type": "module",
+  "main": "./srs.cjs",
+  "module": "./srs.mjs",
+  "exports": {
+    "import": "./srs.mjs",
+    "require": "./srs.cjs"
+  },
+  "bin": "./cli.mjs",
   "files": [
     "srs.js",
     "cli.js",
@@ -15,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tttp/srs2.git"
+    "url": "git+https://github.com/tttp/srs0.git"
   },
   "keywords": [
     "srs",
@@ -24,9 +30,9 @@
   "author": "Xavier Dutoit",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tttp/srs2/issues"
+    "url": "https://github.com/tttp/srs0/issues"
   },
-  "homepage": "https://github.com/tttp/srs2#readme",
+  "homepage": "https://github.com/tttp/srs0#readme",
   "dependencies": {
     "dotenv": "^17.2.1",
     "minimist": "^1.2.8"

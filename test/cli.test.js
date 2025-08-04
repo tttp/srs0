@@ -1,5 +1,5 @@
-const test = require('ava');
-const { spawn } = require('child_process');
+import test from 'ava';
+import { spawn } from 'child_process';
 
 function runCli(args, env = {}) {
     return new Promise((resolve, reject) => {

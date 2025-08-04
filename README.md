@@ -1,6 +1,6 @@
-# srs2
+# Sender Rewriting Scheme (SRS)
 
-**srs2** is a Node.js implementation of the Sender Rewriting Scheme (SRS), a mechanism to prevent SPF-related email delivery issues when forwarding emails.
+**srs0** is a Node.js implementation of the Sender Rewriting Scheme (SRS), a mechanism to prevent SPF-related email delivery issues when forwarding emails.
 
 ## Description
 
@@ -34,7 +34,7 @@ This validity period can be configured when initializing the `SRSRewriter` class
 
 ## Error Codes
 
-The `srs2` library throws `Error` objects with a `code` property for easier programmatic error handling. The possible error codes are:
+The `srs0` library throws `Error` objects with a `code` property for easier programmatic error handling. The possible error codes are:
 
 *   `INVALID_EMAIL_FORMAT`: The provided email address is not in a valid format.
 *   `INVALID_DATE_FORMAT`: The provided date string is not in the expected `YYYY-MM-DD` format.
@@ -48,17 +48,17 @@ The `srs2` library throws `Error` objects with a `code` property for easier prog
 ## Installation
 
 ```bash
-npm install srs2
+npm install srs0
 ```
 
 ## Usage
 
 ### Library
 
-The `srs2` package can be used as a library in your Node.js applications.
+The `srs0` package can be used as a library in your Node.js applications.
 
 ```javascript
-const SRS = require('srs2');
+const SRS = require('srs0');
 
 // for production, don't leave these config in the code
 const srs = new SRS({key: 'my-secret-key', domain: 'example.com'});
@@ -127,7 +127,7 @@ assuming a .env containing
 *   **Encode an email:**
 
     ```bash
-    $npx srs2 user@gmail.com
+    $npx srs0 user@gmail.com
     SRS0=785F=2K=gmail.com=user@example.com
 
     ```
@@ -136,7 +136,7 @@ or
 *   **Decode an SRS address:**
 
     ```bash
-    $npx srs2 SRS0=785F=2K=gmail.com=user@example.com
+    $npx srs0 SRS0=785F=2K=gmail.com=user@example.com
     user@gmail.com 2025-07-29
     ```
 

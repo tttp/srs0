@@ -1,6 +1,6 @@
-const crypto = require("crypto");
+import crypto from "node:crypto";
 
-class SRSRewriter {
+export default class SRSRewriter {
   constructor({ key, prefix, domain, validityDays = 90 }) {
     this.srsKey = key;
     this.srsPrefix = prefix;
@@ -177,4 +177,4 @@ class SRSRewriter {
   }
 }
 
-module.exports = SRSRewriter;
+
